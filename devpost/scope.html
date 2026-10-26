@@ -1,0 +1,338 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escape Perfectionism — Scope</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+  :root {
+    --bg:#0f0e13;--surface:#1a1825;--surface2:#221f30;--border:#2e2a3f;
+    --accent:#7c6af7;--accent2:#c084fc;--warm:#f4a261;--text:#e8e4f0;
+    --muted:#8b85a0;--cut:#4a2020;--cut-text:#f87171;
+    --later:#1a2a1a;--later-text:#86efac;--in:#1a1f35;--in-text:#93c5fd;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:1.7;min-height:100vh;}
+  body::before{content:'';position:fixed;top:-20%;left:30%;width:600px;height:600px;background:radial-gradient(circle,rgba(124,106,247,0.06) 0%,transparent 70%);pointer-events:none;z-index:0;}
+  .container{max-width:840px;margin:0 auto;padding:60px 32px;position:relative;z-index:1;}
+  .header{text-align:center;margin-bottom:56px;}
+  .tag{display:inline-block;font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);background:rgba(124,106,247,.12);border:1px solid rgba(124,106,247,.25);border-radius:99px;padding:4px 14px;margin-bottom:20px;}
+  h1{font-family:'Playfair Display',Georgia,serif;font-size:clamp(2.2rem,5vw,3.2rem);font-weight:600;line-height:1.15;background:linear-gradient(135deg,#e8e4f0 30%,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px;}
+  .subtitle{color:var(--muted);font-size:16px;font-style:italic;max-width:500px;margin:0 auto;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 32px;margin-bottom:20px;transition:border-color .2s;}
+  .card:hover{border-color:rgba(124,106,247,.35);}
+  .card-label{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;}
+  .card h2{font-family:'Playfair Display',Georgia,serif;font-size:1.25rem;font-weight:600;margin-bottom:12px;color:var(--text);}
+  .card p{color:#c4bed8;}
+  .kernel-card{background:linear-gradient(135deg,#1e1a35 0%,#1a1430 100%);border-color:rgba(124,106,247,.4);position:relative;overflow:hidden;}
+  .kernel-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));}
+  .kernel-card .card-label{color:var(--accent2);}
+  .kernel-quote{font-family:'Playfair Display',serif;font-size:1.05rem;font-style:italic;color:var(--accent2);border-left:3px solid var(--accent);padding-left:18px;margin-top:14px;line-height:1.6;}
+  /* Flow diagram */
+  .flow{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:4px 0 12px;}
+  .flow-node{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;min-width:120px;flex-shrink:0;text-align:center;}
+  .flow-node.highlight{background:linear-gradient(135deg,#1e1a35,#1a1430);border-color:rgba(124,106,247,.5);}
+  .flow-node .node-icon{font-size:20px;margin-bottom:6px;}
+  .flow-node .node-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;}
+  .flow-node .node-sub{font-size:11px;color:var(--muted);}
+  .flow-arrow{color:var(--border);font-size:18px;padding:0 4px;flex-shrink:0;display:flex;align-items:center;}
+  /* State bars */
+  .state-row{display:flex;align-items:center;gap:12px;margin-top:8px;}
+  .state-bar{flex:1;height:8px;border-radius:99px;background:#1a1520;overflow:hidden;}
+  .state-bar-inner{height:100%;border-radius:99px;}
+  .state-label{font-size:12px;color:var(--muted);min-width:72px;}
+  /* Journal mechanic */
+  .journal-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:10px;margin-top:16px;}
+  .j-step{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
+  .j-step.active{border-color:rgba(124,106,247,.5);background:linear-gradient(135deg,#1e1a35,#1a1430);}
+  .j-step .js-icon{font-size:18px;margin-bottom:4px;}
+  .j-step .js-label{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;}
+  .j-step .js-sub{font-size:11px;color:var(--muted);}
+  .j-arrow{color:var(--border);font-size:16px;text-align:center;}
+  /* Challenges grid */
+  .challenges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:14px;}
+  .challenge-pill{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+  .challenge-pill .c-name{font-weight:600;color:var(--text);margin-bottom:4px;font-size:13px;}
+  .challenge-pill .c-desc{color:var(--muted);font-size:12px;}
+  /* Boundary */
+  .boundary-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;}
+  .boundary-section{border-radius:12px;padding:18px 20px;}
+  .boundary-section.in{background:var(--in);border:1px solid rgba(147,197,253,.2);}
+  .boundary-section.later{background:var(--later);border:1px solid rgba(134,239,172,.2);}
+  .boundary-section.cut{background:var(--cut);border:1px solid rgba(248,113,113,.2);grid-column:1/-1;}
+  .boundary-title{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;}
+  .in .boundary-title{color:var(--in-text);}
+  .later .boundary-title{color:var(--later-text);}
+  .cut .boundary-title{color:var(--cut-text);}
+  .boundary-section ul{list-style:none;padding:0;}
+  .boundary-section ul li{font-size:13px;color:#c4bed8;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:8px;align-items:baseline;}
+  .boundary-section ul li:last-child{border-bottom:none;}
+  .in ul li::before{content:'✓';color:var(--in-text);font-size:11px;flex-shrink:0;}
+  .later ul li::before{content:'→';color:var(--later-text);font-size:11px;flex-shrink:0;}
+  .cut ul li::before{content:'✕';color:var(--cut-text);font-size:11px;flex-shrink:0;}
+  /* Quote */
+  .learner-quote{background:var(--surface2);border-left:3px solid var(--warm);border-radius:0 12px 12px 0;padding:16px 20px;margin-top:14px;font-style:italic;color:#d4cce8;font-size:14px;}
+  /* Done moment */
+  .done-moment{background:linear-gradient(135deg,#0f1a10,#101520);border:1px solid rgba(134,239,172,.2);border-radius:14px;padding:22px 26px;margin-top:14px;}
+  .done-moment p{color:#c4bed8;margin-bottom:10px;}
+  .done-moment .ending-text{font-family:'Playfair Display',serif;font-size:1.05rem;font-style:italic;color:var(--later-text);margin-top:14px;line-height:1.7;}
+  /* Accordion */
+  details{margin-bottom:8px;}
+  summary{cursor:pointer;list-style:none;padding:11px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-size:13px;font-weight:500;color:var(--text);display:flex;justify-content:space-between;align-items:center;user-select:none;transition:background .15s;}
+  summary::-webkit-details-marker{display:none;}
+  summary::after{content:'+';color:var(--muted);font-size:16px;}
+  details[open] summary::after{content:'−';}
+  details[open] summary{border-radius:10px 10px 0 0;background:#221f30;}
+  .details-body{background:var(--surface2);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:14px 16px;font-size:13px;color:#c4bed8;}
+  .details-body a{color:var(--accent);}
+  /* Footer */
+  .footer{text-align:center;margin-top:60px;padding-top:28px;border-top:1px solid var(--border);color:var(--muted);font-size:13px;}
+  .status-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:99px;padding:4px 12px;font-size:11px;color:#fbbf24;font-weight:500;margin-bottom:16px;}
+  .status-dot{width:6px;height:6px;border-radius:50%;background:#fbbf24;}
+  @media(max-width:580px){.boundary-grid{grid-template-columns:1fr;}.cut{grid-column:1;}.flow{flex-direction:column;}.flow-arrow{transform:rotate(90deg);}.journal-flow{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="tag">2-scope · Draft</div>
+    <h1>Escape Perfectionism</h1>
+    <p class="subtitle">A first-person browser escape room where you experience what it feels like to have a perfectionist mind — and learn how to get through it.</p>
+  </div>
+
+  <div style="text-align:center;margin-bottom:40px;">
+    <div class="status-badge"><div class="status-dot"></div> Status: Draft — awaiting approval</div>
+  </div>
+
+  <!-- Kernel -->
+  <div class="card kernel-card">
+    <div class="card-label">The Unique Kernel</div>
+    <h2>The win isn't finishing perfectly. It's starting at all.</h2>
+    <p>Most games reward perfection. This one rewards action. You play through the paralysis, fear, and intrusive thoughts of perfectionism — not to "fix" yourself, but to understand what's happening and walk away with real tools for your daily life.</p>
+    <div class="kernel-quote">"Action is the real victory that a perfectionist never celebrates."</div>
+  </div>
+
+  <!-- Core Loop -->
+  <div class="card">
+    <div class="card-label">The Core Loop</div>
+    <h2>How one task cycle plays out</h2>
+    <div class="flow" style="margin-top:20px;">
+      <div class="flow-node">
+        <div class="node-icon">🖥️</div>
+        <div class="node-title">Desk Scene</div>
+        <div class="node-sub">First-person POV</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">
+        <div class="node-icon">📋</div>
+        <div class="node-title">Impossible Goals</div>
+        <div class="node-sub">Already written there</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">
+        <div class="node-icon">🔍</div>
+        <div class="node-title">Explore</div>
+        <div class="node-sub">"Explore surroundings?"</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node highlight">
+        <div class="node-icon">💭</div>
+        <div class="node-title">Thought Challenge</div>
+        <div class="node-sub">Choose a response</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node highlight">
+        <div class="node-icon">📓</div>
+        <div class="node-title">Check Journal</div>
+        <div class="node-sub">Decode the feeling</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">
+        <div class="node-icon">💡</div>
+        <div class="node-title">Insight</div>
+        <div class="node-sub">Real takeaway</div>
+      </div>
+    </div>
+
+    <div style="margin-top:22px;border-top:1px solid var(--border);padding-top:18px;">
+      <div style="font-size:12px;color:var(--muted);font-weight:500;margin-bottom:12px;">VISUAL STATE — screen shifts with mental state</div>
+      <div class="state-row">
+        <div class="state-label">Anxiety</div>
+        <div class="state-bar"><div class="state-bar-inner" style="width:90%;background:linear-gradient(90deg,#6b21a8,#4a044e);"></div></div>
+        <div style="font-size:12px;color:var(--muted);">Gloomy, desaturated</div>
+      </div>
+      <div class="state-row">
+        <div class="state-label">Progress</div>
+        <div class="state-bar"><div class="state-bar-inner" style="width:55%;background:linear-gradient(90deg,#7c6af7,#c084fc);"></div></div>
+        <div style="font-size:12px;color:var(--muted);">Subtle warmth returns</div>
+      </div>
+      <div class="state-row">
+        <div class="state-label">Ending</div>
+        <div class="state-bar"><div class="state-bar-inner" style="width:35%;background:linear-gradient(90deg,#f4a261,#fbbf24);"></div></div>
+        <div style="font-size:12px;color:var(--muted);">Relieved, not triumphant</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Journal Mechanic -->
+  <div class="card">
+    <div class="card-label">The Journal Mechanic</div>
+    <h2>Discovered through play, not through menus</h2>
+    <p>The journal is an object in the room — not a UI element. It's found by exploring, used when it matters most.</p>
+    <div class="journal-flow">
+      <div class="j-step">
+        <div class="js-icon">🔍</div>
+        <div class="js-label">Click around</div>
+        <div class="js-sub">"Explore surroundings?" appears</div>
+      </div>
+      <div class="j-arrow">→</div>
+      <div class="j-step active">
+        <div class="js-icon">📓</div>
+        <div class="js-label">Discover journal</div>
+        <div class="js-sub">It's in the room. You find it.</div>
+      </div>
+      <div class="j-arrow">→</div>
+      <div class="j-step active">
+        <div class="js-icon">💭</div>
+        <div class="js-label">Challenge hits</div>
+        <div class="js-sub">"Check your journal" — one of the choices</div>
+      </div>
+    </div>
+    <div style="margin-top:14px;background:var(--surface2);border-radius:10px;padding:14px 16px;font-size:13px;color:#c4bed8;">
+      Opening the journal during a challenge reveals what the feeling actually is — decoded in the character's own words. Not a tooltip. Not a label. A moment of self-awareness.
+    </div>
+  </div>
+
+  <!-- Thought Challenges -->
+  <div class="card">
+    <div class="card-label">Thought Challenges</div>
+    <h2>Perfectionism patterns the player has to face</h2>
+    <p>Each appears as text + a set of choices. One choice is always "check your journal." The environment reacts to what you pick.</p>
+    <div class="challenges-grid">
+      <div class="challenge-pill">
+        <div class="c-name">🔒 Fear of Starting</div>
+        <div class="c-desc">If I start, I might fail — so I won't start at all.</div>
+      </div>
+      <div class="challenge-pill">
+        <div class="c-name">📱 Urge to Check Phone</div>
+        <div class="c-desc">Anything to avoid sitting with the discomfort.</div>
+      </div>
+      <div class="challenge-pill">
+        <div class="c-name">🤕 Physical Symptoms</div>
+        <div class="c-desc">Head hurts. Body says stop before the mind does.</div>
+      </div>
+      <div class="challenge-pill">
+        <div class="c-name">🔄 Constant Comparison</div>
+        <div class="c-desc">"Someone else would have done this better already."</div>
+      </div>
+      <div class="challenge-pill">
+        <div class="c-name">💬 Talk Over Action</div>
+        <div class="c-desc">Planning and preparing endlessly instead of doing.</div>
+      </div>
+      <div class="challenge-pill">
+        <div class="c-name">📉 Unrealistic Goals</div>
+        <div class="c-desc">2 chapters in an hour. 3 projects today. Already set up to fail.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Who it's for -->
+  <div class="card">
+    <div class="card-label">Who It's For</div>
+    <h2>Someone staring at a task they can't start</h2>
+    <p>They know they're procrastinating. They can't stop. They've felt that chest-tightening spiral. They want to understand why — or just feel less alone in it. They don't need to be a gamer.</p>
+  </div>
+
+  <!-- Why it matters -->
+  <div class="card">
+    <div class="card-label">Why This Matters</div>
+    <h2>This is personal</h2>
+    <p>The learner lives with severe perfectionism. It shapes how they see themselves, their relationships, their work, their body, their day. Building this is itself an act of processing it — and making something that could help others carry what they carry.</p>
+    <div class="learner-quote">"I want the player to go through having a perfectionist mind and face it... at the end, not to be hard on their selves."</div>
+  </div>
+
+  <!-- What working looks like -->
+  <div class="card">
+    <div class="card-label">What "Working" Looks Like</div>
+    <h2>The demo moment</h2>
+    <p>You open the game in a browser. A desk — journal on the left, laptop drowning in tabs, a task list with goals that are already impossible. You click around. "Explore surroundings?" — you find the journal. You try to start a task. A thought hits. You choose to check the journal. It decodes the feeling. You push through two or three challenges. You finish.</p>
+    <div class="done-moment">
+      <p>The game reflects the honest ending: relieved, but not satisfied. Maybe still blaming yourself.</p>
+      <div class="ending-text">"You finished it.<br>That's the part a perfectionist never celebrates.<br>Action is the real win.<br><br>Be less hard on yourself."</div>
+    </div>
+  </div>
+
+  <!-- POC Boundary -->
+  <div class="card">
+    <div class="card-label">Proof of Concept Boundary</div>
+    <h2>What's in, what's later, what's cut</h2>
+    <div class="boundary-grid">
+      <div class="boundary-section in">
+        <div class="boundary-title">✓ In — PoC</div>
+        <ul>
+          <li>One desk scene — journal, tabs, atmospheric lighting</li>
+          <li>Task list with impossible goals already written</li>
+          <li>"Explore surroundings?" journal discovery</li>
+          <li>2–3 thought challenges (text + choices)</li>
+          <li>"Check journal" as a recurring choice</li>
+          <li>Visual anxiety state system</li>
+          <li>Insight + self-compassion ending</li>
+          <li>Runs in browser, no install</li>
+        </ul>
+      </div>
+      <div class="boundary-section later">
+        <div class="boundary-title">→ Later</div>
+        <ul>
+          <li>Multiple task cycles / levels</li>
+          <li>Inner monologue audio</li>
+          <li>Journal decoded full screen</li>
+          <li>Multiple endings by choices</li>
+          <li>Mobile layout</li>
+          <li>Narrated voiceover</li>
+        </ul>
+      </div>
+      <div class="boundary-section cut">
+        <div class="boundary-title">✕ Cut — with reason</div>
+        <ul>
+          <li>Perfect run reward / high score — contradicts the entire point</li>
+          <li>Multiplayer or social — solo inner experience only</li>
+          <li>Backend / database — nothing needs saving for PoC</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inspiration -->
+  <div class="card">
+    <div class="card-label">Inspiration & Identity</div>
+    <h2>Atmospheric. Emotionally honest. Quiet and eerie.</h2>
+    <div style="margin-top:14px;">
+      <details>
+        <summary>Dark Dome escape rooms — visual reference</summary>
+        <div class="details-body">Detailed environments, atmospheric lighting, slightly unsettling quality. The feeling of being inside a real place you have to read carefully. <a href="https://darkdome.com" target="_blank">darkdome.com</a></div>
+      </details>
+      <details>
+        <summary>First-person POV games & films</summary>
+        <div class="details-body">You inhabit the character, not observe them. The camera is the self. What you see is filtered through the character's mental state.</div>
+      </details>
+      <details>
+        <summary>Inner-voice fiction</summary>
+        <div class="details-body">Books and films that put you inside the character's head — naming feelings, tracing causes and effects, giving texture to the sounds of anxious thought.</div>
+      </details>
+      <details>
+        <summary>Color & mood</summary>
+        <div class="details-body">Muted, cool tones that shift warmer as you move through. Anxiety = gloomy and desaturated. Progress = subtle warmth bleeding back in. The ending is relieved, not triumphant.</div>
+      </details>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>devpost/scope.md · Escape Perfectionism · Build With AI: Basics</p>
+    <p style="margin-top:6px;">Next step: <strong>3-prd</strong> — get specific about every screen and behavior.</p>
+  </div>
+
+</div>
+</body>
+</html>

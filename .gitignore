@@ -1,0 +1,7 @@
+# Devpost Learn: keep personal learning context out of commits
+devpost/learner-profile.md
+
+# Environment / secrets
+.env
+.env.*
+!.env.example

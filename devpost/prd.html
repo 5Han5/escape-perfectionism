@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escape Perfectionism â€” PRD</title>
+<style>
+  :root{--bg:#090e17;--s:#101a2b;--s2:#16233b;--b:#223758;--a:#4b8fe2;--a2:#84bbf7;--warm:#f4a261;--t:#e2eaf5;--m:#8397b3;--ok:#86efac;--no:#f87171;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--t);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.7}
+  .wrap{max-width:900px;margin:0 auto;padding:56px 28px}
+  h1{font-family:Georgia,serif;font-size:2.6rem;line-height:1.15;margin:10px 0 12px;background:linear-gradient(135deg,#e2eaf5 30%,var(--a2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .tag{display:inline-block;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--a);border:1px solid rgba(75,143,226,.3);background:rgba(75,143,226,.1);border-radius:99px;padding:3px 12px}
+  .sub{color:var(--m);font-style:italic;max-width:620px}
+  .badge{display:inline-block;margin:16px 0 36px;font-size:11px;color:#fbbf24;border:1px solid rgba(251,191,36,.3);background:rgba(251,191,36,.08);border-radius:99px;padding:3px 12px}
+  .card{background:var(--s);border:1px solid var(--b);border-radius:16px;padding:26px 28px;margin-bottom:20px}
+  .label{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--a);margin-bottom:8px}
+  h2{font-family:Georgia,serif;font-size:1.25rem;margin-bottom:10px}
+  p,li{color:#b6c6dc}
+  .expand{background:linear-gradient(135deg,#13223d,#0f1a2e);border:1px solid rgba(75,143,226,.4);border-radius:12px;padding:14px 18px;margin-bottom:20px;font-size:14px}
+  .expand b{color:var(--a2)}
+  /* journey svg */
+  .svgwrap{overflow-x:auto;padding-bottom:6px}
+  .steps{display:flex;gap:10px;min-width:max-content;align-items:stretch}
+  .st{width:118px;background:var(--s2);border:1px solid var(--b);border-radius:12px;padding:12px 10px;text-align:center;font-size:12px;cursor:pointer;transition:.2s}
+  .st:hover,.st.on{border-color:var(--a);background:#1a2b48}
+  .st .n{font-size:10px;color:var(--m)}
+  .st .i{font-size:20px;margin:2px 0}
+  .st.key{border-color:rgba(132,187,247,.5)}
+  .arrow{align-self:center;color:var(--b)}
+  #detail{margin-top:16px;background:var(--s2);border:1px solid var(--b);border-radius:12px;padding:16px 18px;min-height:96px}
+  #detail h3{font-size:14px;margin-bottom:6px;color:var(--a2)}
+  /* gloom meter */
+  .meter{height:10px;border-radius:99px;background:#0d1522;overflow:hidden;margin:10px 0}
+  .fill{height:100%;width:20%;background:linear-gradient(90deg,#4b8fe2,#1a365d);transition:.4s}
+  input[type=range]{width:100%;accent-color:#4b8fe2}
+  .scene{height:120px;border-radius:12px;margin-top:12px;display:flex;align-items:center;justify-content:center;font-style:italic;color:#e8e4f0;border:1px solid var(--b);transition:.4s;text-align:center;padding:10px}
+  /* notes */
+  .notes{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+  .note{background:#d9c97a;color:#3a3210;padding:12px 14px;border-radius:3px;font-family:"Segoe Print","Comic Sans MS",cursive;font-size:13px;width:170px;transform:rotate(-2deg);box-shadow:2px 3px 8px rgba(0,0,0,.4)}
+  .note:nth-child(2){transform:rotate(1.5deg)}
+  .note:nth-child(3){transform:rotate(-1deg)}
+  .note.after{background:#c8d9a0}
+  /* details */
+  details{margin-bottom:8px}
+  summary{cursor:pointer;list-style:none;padding:11px 16px;background:var(--s2);border:1px solid var(--b);border-radius:10px;font-size:13px;font-weight:500;display:flex;justify-content:space-between}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:'+';color:var(--m)}
+  details[open] summary::after{content:'âˆ’'}
+  details[open] summary{border-radius:10px 10px 0 0}
+  .body{background:var(--s2);border:1px solid var(--b);border-top:none;border-radius:0 0 10px 10px;padding:12px 16px;font-size:13px}
+  .body ul{margin-left:18px}
+  .crit li{list-style:none;margin-left:0}
+  .crit li::before{content:'â˜ ';color:var(--ok)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .col{border-radius:12px;padding:16px 18px;font-size:13px}
+  .now{background:#1a1f35;border:1px solid rgba(147,197,253,.2)}
+  .def{background:#1a2a1a;border:1px solid rgba(134,239,172,.2)}
+  .non{background:#3a1c1c;border:1px solid rgba(248,113,113,.2);grid-column:1/-1}
+  .col h4{font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+  .now h4{color:#93c5fd}.def h4{color:var(--ok)}.non h4{color:var(--no)}
+  .col ul{margin-left:16px}
+  .fonts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:10px}
+  .font{background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:14px}
+  .font .s{font-size:20px;margin:6px 0}
+  a{color:var(--a2)}
+  .swatches{display:flex;gap:8px;margin-top:10px}
+  .sw{flex:1;height:44px;border-radius:8px;font-size:10px;display:flex;align-items:flex-end;padding:4px 6px;color:#fff;text-shadow:0 1px 2px #000}
+  .j-page{background:#101826;border:1px solid #1e314f;border-radius:12px;padding:20px 22px;margin-top:12px;font-family:'Segoe Print','Comic Sans MS',cursive}
+  .j-item{margin-bottom:14px;padding:10px 12px;border-radius:8px;border:1px solid transparent;position:relative;transition:all .2s ease}
+  .j-line{font-size:15px;color:#e2eaf5;line-height:1.55}
+  
+  /* Mode A: Arrow click */
+  .mode-a .arrow-btn{background:#16263e;border:1px solid #2b4570;color:#84bbf7;border-radius:6px;padding:2px 8px;font-size:12px;cursor:pointer;margin-left:8px;font-family:system-ui,sans-serif;transition:.15s}
+  .mode-a .arrow-btn:hover{background:#233c63;color:#fff}
+  .mode-a .arrow-reveal{display:none;background:#1a2b44;border:1px solid #2f4b75;color:#9ec4f5;font-size:12px;font-family:system-ui,sans-serif;padding:3px 10px;border-radius:99px;margin-left:8px}
+  .mode-a .arrow-reveal.open{display:inline-block}
+  .mode-a .j-fade{display:none !important}
+
+  /* Mode B: Hover disappears & replaced by faded gray */
+  .mode-b .arrow-btn,.mode-b .arrow-reveal{display:none !important}
+  .mode-b .j-item:hover{background:rgba(75,143,226,.05);border-color:rgba(75,143,226,.2)}
+  .mode-b .j-fade{display:none;color:#94a8c4;font-size:14px;font-style:italic;font-family:system-ui,sans-serif;padding:6px 0;text-align:center}
+  .mode-b .j-item:hover .j-line{display:none}
+  .mode-b .j-item:hover .j-fade{display:block}
+
+  /* Page 3 Tilted Frames */
+  .frame-stack{display:flex;flex-direction:column;gap:14px;margin-top:12px;font-family:system-ui,sans-serif}
+  .tilt-frame{background:#132034;border:1px solid #223a60;border-radius:10px;padding:14px 18px;box-shadow:0 6px 16px rgba(0,0,0,.35);transition:transform .2s ease,border-color .2s ease}
+  .tilt-frame:hover{transform:rotate(0deg) scale(1.02) !important;border-color:#4b8fe2}
+  .tilt-1{transform:rotate(-1.8deg)}
+  .tilt-2{transform:rotate(1.5deg)}
+  .tilt-3{transform:rotate(-1.2deg)}
+  .frame-title{font-size:14px;font-weight:600;color:#84bbf7;margin-bottom:6px;text-align:center}
+  .frame-desc{font-size:13px;color:#c4bed8;line-height:1.5}
+
+  .mode-toggle{display:flex;gap:8px;margin-bottom:12px;background:#0d1422;padding:6px;border-radius:10px;border:1px solid #1b2c47}
+  .m-btn{flex:1;background:transparent;border:none;color:#8397b3;padding:8px 12px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;transition:.2s}
+  .m-btn.active{background:#1c2e4f;color:#e2eaf5;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+  .j-nav{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .j-btn{background:#16233b;border:1px solid #223758;color:#8397b3;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;transition:.2s}
+  .j-btn:hover{color:#e2eaf5}
+  .j-btn.active{background:#1c2e4f;border-color:#4b8fe2;color:#e2eaf5}
+  @media(max-width:620px){.grid{grid-template-columns:1fr}.non{grid-column:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">3-prd Â· Draft</span>
+  <h1>Escape Perfectionism</h1>
+  <p class="sub">A first-person 2D escape-room game where a college CS student sits at a desk and feels the freeze, dread, and escape-spirals of perfectionism, then finds a gentle way through.</p>
+  <div class="badge">Status: draft â€” awaiting your review</div>
+
+  <div class="expand"><b>What scope became:</b> scope said "thought challenges, a journal, a calm ending." Now we know exactly what that means: three sticky notes, six tasks, three choices, three puzzles, and a journal that explains each feeling.</div>
+
+  <div class="card">
+    <div class="label">The Core Journey</div>
+    <h2>Click a step to see what happens</h2>
+    <div class="svgwrap"><div class="steps" id="steps"></div></div>
+    <div id="detail"><h3>Pick a step above</h3><p>Each step shows what the player sees and does.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="label">Gloom Meter</div>
+    <h2>The screen tries to get your attention</h2>
+    <p>Drag to see how the scene changes as dread builds and eases.</p>
+    <input type="range" min="0" max="100" value="20" id="gloom">
+    <div class="meter"><div class="fill" id="fill"></div></div>
+    <div class="scene" id="scene">"I should really get some stuff done."</div>
+  </div>
+
+  <div class="card">
+    <div class="label">The Desk</div>
+    <h2>Sticky notes and the to-do list</h2>
+    <div class="notes">
+      <div class="note">Everyone else is already done</div>
+      <div class="note">Don't mess this up</div>
+      <div class="note">Assignment due tomorrow, get going</div>
+    </div>
+    <p style="margin:14px 0 6px">At the end, the second note changes:</p>
+    <div class="notes"><div class="note after">Don't be so hard on yourself</div></div>
+    <p style="margin:16px 0 6px"><b>To-do list:</b></p>
+    <ul style="margin-left:18px">
+      <li>Finish 2 chapters</li><li>Work on your 2 projects</li><li>Prepare next week's study material</li>
+      <li>Finish half of the C++ course</li><li>Start going to the gym</li><li>Fix your sleeping schedule</li>
+    </ul>
+    <p style="margin-top:12px;font-size:13px;color:var(--m)">Hover labels: "Journal", "To-do list", "Open drawer", "Laptop". The words "perfect" and "perfectionism" are never used. The pattern shows through the journal.</p>
+  </div>
+
+  <div class="card">
+    <div class="label">The Journal · Interactive Prototype (Option B)</div>
+    <h2>Hover over any sentence to reveal the root feeling</h2>
+    <p style="margin-bottom:14px">When your cursor hovers over a sentence, the handwriting disappears and shows the root cause in simple, faded gray text.</p>
+
+    <!-- Page Nav -->
+    <div class="j-nav">
+      <button class="j-btn active" onclick="showJPage(1)">Page 1: Pressure, Comparison & Detail</button>
+      <button class="j-btn" onclick="showJPage(2)">Page 2: Inner Critic, Control & Panic</button>
+      <button class="j-btn" onclick="showJPage(3)">Page 3: ( When in Panic )</button>
+    </div>
+
+    <div id="journalContainer" class="mode-b">
+      <!-- Page 1 -->
+      <div id="jp1" class="j-page">
+        <!-- 1. Procrastination & fear of failure -->
+        <div class="j-item">
+          <span class="j-line">"Today was really hard, I haven't got anything done. It's only getting more accumulated on me."</span>
+          <div class="j-fade">Procrastination & fear of failure</div>
+        </div>
+
+        <!-- 2. Comparison -->
+        <div class="j-item">
+          <span class="j-line">"People are doing way better than me. Everyone has their stuff together."</span>
+          <div class="j-fade">Constant comparison</div>
+        </div>
+
+        <!-- 3. All-or-nothing -->
+        <div class="j-item">
+          <span class="j-line">"If I can't do this whole project properly today, what's the point of starting?"</span>
+          <div class="j-fade">All-or-nothing thinking</div>
+        </div>
+
+        <!-- 4. Video rewinding / Obsessive detail -->
+        <div class="j-item">
+          <span class="j-line">"I keep rewinding the 1 hour video to grasp every meaning of every word, it has been 4 hours and it's still not done."</span>
+          <div class="j-fade">Fear of missing out on any information and obsessive detail</div>
+        </div>
+      </div>
+
+      <!-- Page 2 -->
+      <div id="jp2" class="j-page" style="display:none">
+        <!-- 5. Distrust & Control -->
+        <div class="j-item">
+          <span class="j-line">"I don't trust anyone else to do this right, but I don't trust myself either."</span>
+          <div class="j-fade">Need for control & difficulty delegating</div>
+        </div>
+
+        <!-- 6. Imposter & Self-criticism -->
+        <div class="j-item">
+          <span class="j-line">"Everyone works hard. Me? I'm just faking it, and I suck at everything."</span>
+          <div class="j-fade">Intense self-criticism & imposter syndrome</div>
+        </div>
+
+        <!-- 7. Conditional self-worth -->
+        <div class="j-item">
+          <span class="j-line">"I only feel okay when everything is finished and flawless."</span>
+          <div class="j-fade">Conditional self-worth</div>
+        </div>
+
+        <!-- 8. Physical anxiety -->
+        <div class="j-item">
+          <span class="j-line">"I can't stand staying in this body... my chest feels tight."</span>
+          <div class="j-fade">Physical anxiety & panic</div>
+        </div>
+      </div>
+
+      <!-- Page 3: Tilted Frames -->
+      <div id="jp3" class="j-page" style="display:none; font-family:system-ui,sans-serif; background:#0c1421">
+        <div style="color:var(--a2);font-weight:600;font-size:16px;margin:8px 0 16px;text-align:center">( When in Panic )</div>
+        
+        <div class="frame-stack">
+          <div class="tilt-frame tilt-1">
+            <div class="frame-title">Close your eyes, breathe</div>
+          </div>
+
+          <div class="tilt-frame tilt-2">
+            <div class="frame-title">Calm yourself, be kind</div>
+            <div class="frame-desc">Don't throw mean words at yourself. Would you treat a child that way? Have some mercy.</div>
+          </div>
+
+          <div class="tilt-frame tilt-3">
+            <div class="frame-title">Think of the next tiny step you will take</div>
+            <div class="frame-desc">The step to take after you open your eyes: just read the first sentence on page 1.<br><br>Fighting the paralysis and just doing that is enough, and it's not simple, reading 1 sentence is huge, trust me, it's okay and you're doing fine.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Research & Visual References -->
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--b);font-size:12px;color:var(--m)">
+      <b>Research & Reference Links:</b>
+      <div style="margin-top:4px">
+        • Research: <a href="https://www.apa.org/monitor/2021/11/cover-perfectionism" target="_blank">APA on Perfectionism, Anxiety, and Self-Critical Depression</a><br>
+        • Psychology: <a href="https://www.health.harvard.edu/blog/how-to-overcome-perfectionism-202201192671" target="_blank">Harvard Health on Breaking Perfectionism & Somatic Burnout</a><br>
+        • Tilted Frames Reference: <a href="https://milanote.com" target="_blank">Milanote Visual Boards</a> / <a href="https://miro.com" target="_blank">Miro Moodboards</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label">Behaviors and Checks</div>
+    <h2>What "working" means, screen by screen</h2>
+    <details><summary>Paralysis and the three choices</summary><div class="body">
+      <ul class="crit">
+        <li>Thoughts appear in order: which first, am I even going to finish, maybe the other one.</li>
+        <li>Three choices: check the phone, what's more fun, just pick anything.</li>
+        <li>Phone or fun adds time pressure and a gloomier screen.</li>
+        <li>"Just pick anything" starts the puzzles.</li>
+      </ul></div></details>
+    <details><summary>Shrink the task puzzle</summary><div class="body">
+      <p>"Finish 2 chapters" becomes "Finish studying the first 3 pages of chapter 1", then "Open the book to page 1."</p>
+      <ul class="crit"><li>The text steps down in three stages and ends on the tiny first action.</li></ul></div></details>
+    <details><summary>Close the tabs puzzle</summary><div class="body">
+      <p>The view zooms into the laptop. The player closes distracting tabs and keeps the lecture slides and the assignment.</p>
+      <ul class="crit"><li>Only the lecture slides and assignment tabs remain open.</li></ul></div></details>
+    <details><summary>Journal</summary><div class="body">
+      <p>Found in the drawer, placed on the desk, offered as a choice when feelings build, and ends with a last page: notice the feeling and why, calm down and be kind to yourself, set the next step.</p>
+      <ul class="crit"><li>The drawer opens, the journal lands on the desk.</li><li>"Go to your journal" appears when feelings build.</li><li>Each entry explains the reason behind a feeling.</li><li>The last page lists the three steps.</li></ul></div></details>
+    <details><summary>Quiet the chest tightness</summary><div class="body">
+      <p>A hold-to-breathe interaction settles the screen before the ending.</p>
+      <ul class="crit"><li>Holding the control calms the visuals; releasing early lets them tighten again.</li></ul></div></details>
+    <details><summary>States</summary><div class="body"><ul>
+      <li><b>First use:</b> intro plays, no journal yet.</li>
+      <li><b>Journal not found:</b> the journal choice does not appear (assumption: a gentle nudge toward the drawer).</li>
+      <li><b>Wasting time:</b> clock and deadline note feel closer, but the game never ends in failure.</li>
+      <li><b>Persistence:</b> nothing saved; refresh starts over.</li></ul></div></details>
+  </div>
+
+  <div class="card">
+    <div class="label">Look and Feel</div>
+    <h2>Dark Dome mood, quiet and eerie</h2>
+    <p>Dark Dome is a studio that makes point-and-click escape-game stories with moody, detailed art: <a href="https://darkdome.com" target="_blank">darkdome.com</a>. Mood-only cousins: <a href="https://rustylake.com" target="_blank">Rusty Lake</a> and <a href="https://amanita-design.net" target="_blank">Amanita Design</a>.</p>
+    <div class="swatches">
+      <div class="sw" style="background:#0b1220">Night desk</div>
+      <div class="sw" style="background:#1c2b45">Deep blue</div>
+      <div class="sw" style="background:#3d5a80">Steel blue</div>
+      <div class="sw" style="background:#8fa6bf">Blue fog</div>
+      <div class="sw" style="background:#d9c97a;color:#3a3210;text-shadow:none">Sticky note</div>
+      <div class="sw" style="background:#f4a261">Warmth</div>
+    </div>
+    <p style="margin-top:14px"><b>Proposed fonts</b> (not confirmed):</p>
+    <div class="fonts">
+      <div class="font"><div class="label">Journal and notes</div><div class="s" style="font-family:'Segoe Print','Comic Sans MS',cursive">I don't feel any achievements.</div><a href="https://fonts.google.com/specimen/Caveat" target="_blank">Caveat</a></div>
+      <div class="font"><div class="label">Inner thoughts</div><div class="s" style="font-family:Georgia,serif;font-style:italic">Am I even going to finish this?</div><a href="https://fonts.google.com/specimen/Cormorant+Garamond" target="_blank">Cormorant Garamond</a></div>
+      <div class="font"><div class="label">Small labels</div><div class="s" style="font-family:'Courier New',monospace;font-size:15px">Open drawer Â· To-do list</div><a href="https://fonts.google.com/specimen/Special+Elite" target="_blank">Special Elite</a></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label">The Boundary</div>
+    <div class="grid">
+      <div class="col now"><h4>Building</h4><ul><li>Walk-up intro and opening line</li><li>One desk scene with hover labels</li><li>Six-task list and three sticky notes</li><li>Paralysis sequence and three choices</li><li>Drawer to journal discovery</li><li>Three puzzles</li><li>Journal entries and last page</li><li>Ending with the changed note</li></ul></div>
+      <div class="col def"><h4>Deferred</h4><ul><li>More task cycles</li><li>Sound and audio</li><li>Multiple endings</li><li>Mobile layout</li></ul></div>
+      <div class="col non"><h4>Non-goals</h4><ul><li>No perfect-run reward or score</li><li>No multiplayer or backend</li><li>No therapy or medical claims</li></ul></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label">Open Questions</div>
+    <ul style="margin-left:18px"><li>Journal wording and when each entry appears â€” next up.</li><li>Fonts and exact colors â€” proposed above, waiting on you.</li><li>How the game nudges a player who never opens the drawer.</li></ul>
+  </div>
+</div>
+
+<script>
+const steps=[
+ ["🚶","Walk-up","The character walks up to the desk and says: \"I should really get some stuff done.\""],
+ ["🖥️","The desk","Explore the desk: drawer, laptop, to-do notepad, organizer, sticky notes on wall."],
+ ["📋","To-do list","Clicking a task triggers choosing paralysis: \"Should I really start this one? Am I even gonna finish?\""],
+ ["✂️","Shrink task","\"We aren't superheroes.\" 2 chapters becomes 3 pages, then \"open the book to page 1.\" Next goal: clear unnecessary tabs."],
+ ["🗂️","Close tabs","Zoom into the laptop and close distracting tabs, keeping only the lecture slides and assignment."],
+ ["💭","The thought","Screen is clear, but mind is spinning: \"Sighs... I feel overwhelmed and distracted by many thoughts. I will get to my journal...\""],
+ ["🗄️","Find journal","If on desk, open it. If not found yet: prompt to search drawer, pull journal out onto desk."],
+ ["📓","Decode mind","Flip through handwritten entries that decode the feelings (imposter syndrome, comparison, fear)."],
+ ["🌱","Reset page","The 3-step reframing: notice feelings and why, be kind to yourself, set the next step."],
+ ["🌬️","Breathe","Hold to breathe; settle chest tightness and remaining anxiety."],
+ ["✨","Ending","First real action taken. Note changes to \"Don't be so hard on yourself.\" Action is the real victory."]
+];
+const box=document.getElementById('steps'),det=document.getElementById('detail');
+steps.forEach((s,i)=>{
+  const d=document.createElement('div');d.className='st'+([6,7,10].includes(i)?' key':'');
+  d.innerHTML='<div class="n">Step '+(i+1)+'</div><div class="i">'+s[0]+'</div><b>'+s[1]+'</b>';
+  d.onclick=()=>{document.querySelectorAll('.st').forEach(x=>x.classList.remove('on'));d.classList.add('on');
+    det.innerHTML='<h3>'+(i+1)+'. '+s[1]+'</h3><p>'+s[2]+'</p>';};
+  box.appendChild(d);
+  if(i<steps.length-1){const a=document.createElement('div');a.className='arrow';a.textContent='â†’';box.appendChild(a);}
+});
+const g=document.getElementById('gloom'),f=document.getElementById('fill'),sc=document.getElementById('scene');
+function upd(){
+  const v=+g.value;f.style.width=v+'%';
+  const sat=100-v*0.7, br=100-v*0.55;
+  sc.style.filter='saturate('+sat+'%) brightness('+br+'%)';
+  sc.style.background='linear-gradient(135deg,rgb('+(35-v*0.3)+','+(65-v*0.4)+','+(105-v*0.5)+'),rgb(9,14,23))';
+  sc.textContent=v<30?'"I should really get some stuff done."':v<65?'"Maybe the other one? Just check the phone one last time..."':'"It isn\'t going to end. This will affect my anxiety if I\'m late."';
+}
+g.oninput=upd;upd();
+
+function showJPage(num){
+  document.getElementById('jp1').style.display = num===1?'block':'none';
+  document.getElementById('jp2').style.display = num===2?'block':'none';
+  document.getElementById('jp3').style.display = num===3?'block':'none';
+  const btns = document.querySelectorAll('.j-btn');
+  btns.forEach((b,idx)=> b.classList.toggle('active', idx === num-1));
+}
+
+function setMode(mode){
+  const container = document.getElementById('journalContainer');
+  container.className = mode;
+  document.getElementById('btnModeA').classList.toggle('active', mode==='mode-a');
+  document.getElementById('btnModeB').classList.toggle('active', mode==='mode-b');
+}
+
+function toggleArrow(btn){
+  const rev = btn.nextElementSibling;
+  if(rev && rev.classList.contains('arrow-reveal')){
+    rev.classList.toggle('open');
+  }
+}
+</script>
+</body>
+</html>
+
+

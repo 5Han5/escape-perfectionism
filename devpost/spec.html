@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escape Perfectionism — Technical Spec & Component Playground</title>
+<style>
+  :root {
+    --bg: #090e17; --s: #101a2b; --s2: #16233b; --b: #223758;
+    --a: #4b8fe2; --a2: #84bbf7; --warm: #f4a261; --t: #e2eaf5; --m: #8397b3;
+    --ok: #86efac; --no: #f87171;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--t); font-family: system-ui, -apple-system, sans-serif; font-size: 15px; line-height: 1.7; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 56px 28px; }
+  .tag { display: inline-block; font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: var(--a); border: 1px solid rgba(75,143,226,.3); background: rgba(75,143,226,.1); border-radius: 99px; padding: 3px 12px; }
+  h1 { font-family: Georgia, serif; font-size: 2.6rem; line-height: 1.15; margin: 10px 0 12px; background: linear-gradient(135deg, #e2eaf5 30%, var(--a2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .sub { color: var(--m); font-style: italic; max-width: 700px; }
+  .badge { display: inline-block; margin: 16px 0 32px; font-size: 11px; color: #fbbf24; border: 1px solid rgba(251,191,36,.3); background: rgba(251,191,36,.08); border-radius: 99px; padding: 3px 12px; }
+  .card { background: var(--s); border: 1px solid var(--b); border-radius: 16px; padding: 26px 28px; margin-bottom: 24px; }
+  .label { font-size: 10px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--a); margin-bottom: 8px; }
+  h2 { font-family: Georgia, serif; font-size: 1.35rem; margin-bottom: 12px; color: var(--t); }
+  p, li { color: #b6c6dc; }
+  
+  /* Sandbox Grid */
+  .sandbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 18px; }
+  .sandbox-card { background: #0c1422; border: 1px solid #1e3252; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+  .sandbox-card h3 { font-size: 14px; font-weight: 600; color: var(--a2); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .sandbox-desc { font-size: 12px; color: var(--m); margin-bottom: 14px; line-height: 1.5; }
+
+  /* 1. Drawer Demo */
+  .drawer-box { height: 130px; background: #070b13; border: 1px solid #1a2c47; border-radius: 8px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 12px; }
+  .drawer-front { width: 180px; height: 42px; background: #1a2a44; border: 1px solid #2d466f; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 2; position: relative; }
+  .drawer-front:hover { background: #223758; }
+  .drawer-handle { width: 50px; height: 6px; background: #84bbf7; border-radius: 99px; }
+  .drawer-inside { width: 160px; height: 45px; background: #0d1726; border: 1px dashed #203554; border-radius: 4px; position: absolute; top: 12px; z-index: 1; display: flex; align-items: center; justify-content: center; }
+  .drawer-open .drawer-front { transform: translateY(48px); }
+  .mini-journal { font-size: 11px; background: #3b2818; color: #f4d06f; border: 1px solid #8c6239; padding: 3px 8px; border-radius: 3px; cursor: pointer; user-select: none; }
+  .mini-journal:hover { filter: brightness(1.2); }
+  .desk-journal { font-size: 11px; background: #3b2818; color: #f4d06f; border: 1px solid #8c6239; padding: 4px 10px; border-radius: 3px; display: inline-block; margin-top: 10px; animation: popIn 0.3s ease; }
+  @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  /* 2. To-Do List & Shrink Task Demo */
+  .notepad-box { background: #131c2c; border: 1px solid #203554; border-radius: 8px; padding: 12px; font-family: 'Segoe Print', cursive, sans-serif; font-size: 12px; min-height: 130px; display: flex; flex-direction: column; justify-content: center; }
+  .task-item { padding: 4px 6px; border-radius: 4px; cursor: pointer; transition: background 0.2s; color: #e2eaf5; }
+  .task-item:hover { background: rgba(75,143,226,0.15); color: #84bbf7; }
+  .task-dialogue { font-family: Georgia, serif; font-style: italic; color: #f4a261; font-size: 12px; margin-top: 8px; border-top: 1px solid #1f3352; padding-top: 6px; line-height: 1.4; }
+
+  /* 3. Laptop Tabs Demo */
+  .tabs-browser { background: #070b13; border: 1px solid #1c2e4a; border-radius: 8px; overflow: hidden; min-height: 130px; display: flex; flex-direction: column; }
+  .browser-header { background: #0e1726; border-bottom: 1px solid #1c2e4a; padding: 6px 8px; display: flex; gap: 4px; overflow-x: auto; }
+  .browser-tab { font-size: 10px; background: #152338; border: 1px solid #23395c; padding: 3px 8px; border-radius: 4px; display: flex; align-items: center; gap: 6px; color: #b6c6dc; white-space: nowrap; }
+  .browser-tab.essential { border-color: #4b8fe2; color: #e2eaf5; }
+  .tab-close { cursor: pointer; font-size: 10px; color: #f87171; font-weight: bold; border-radius: 50%; padding: 0 2px; }
+  .tab-close:hover { background: rgba(248,113,113,0.2); }
+  .browser-content { flex: 1; padding: 14px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; color: #8397b3; }
+
+  /* 4. Sticky Note Morph */
+  .sticky-box { min-height: 130px; display: flex; align-items: center; justify-content: center; }
+  .sticky-preview { width: 160px; padding: 14px; background: #d9c97a; color: #3a3210; font-family: 'Segoe Print', cursive, sans-serif; font-size: 12px; border-radius: 2px; box-shadow: 2px 4px 10px rgba(0,0,0,0.5); transform: rotate(-2deg); transition: all 0.4s ease; text-align: center; cursor: pointer; }
+  .sticky-preview.morphed { background: #c8d9a0; color: #223512; transform: rotate(1deg); }
+
+  /* 5. Camera Zoom */
+  .mini-room-wrap { width: 100%; height: 130px; background: #070b12; border: 1px solid #1a2c47; border-radius: 8px; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; }
+  .mini-room { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+  .mini-desk { width: 170px; height: 50px; background: #182840; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+  .mini-laptop-btn { width: 48px; height: 30px; background: #2f4e7c; border: 1px solid #84bbf7; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; cursor: pointer; }
+  .zoomed .mini-room { transform: scale(3.0) translate(0px, 0px); }
+
+  /* 6. Hold to Breathe */
+  .breathe-box { min-height: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .breathe-circle { width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, #4b8fe2 0%, #162a4a 100%); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: #fff; user-select: none; cursor: pointer; transition: transform 3s ease-out, box-shadow 0.3s; box-shadow: 0 0 10px rgba(75,143,226,0.3); }
+  .breathe-circle.holding { transform: scale(1.6); box-shadow: 0 0 25px rgba(132,187,247,0.8); }
+
+  /* Button controls */
+  .btn-reset { background: #16233b; border: 1px solid #223758; color: #8397b3; padding: 4px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; align-self: flex-start; margin-top: 10px; }
+  .btn-reset:hover { color: #e2eaf5; }
+
+  pre { background: #070c14; border: 1px solid #182a45; border-radius: 10px; padding: 14px 16px; font-family: "Courier New", monospace; font-size: 12px; color: #9ab4d6; overflow-x: auto; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">4-spec · Blueprint Playground</span>
+  <h1>Escape Perfectionism — Technical Spec</h1>
+  <p class="sub">Complete technical blueprint with interactive prototypes for every mechanic: the sliding drawer, to-do list shrinker, tab closer, sticky note morph, camera zoom, and breathing timer.</p>
+  <div class="badge" style="background:rgba(34,197,94,0.15);color:#86efac;border-color:rgba(34,197,94,0.3)">Status: approved ✅</div>
+
+  <!-- Interactive Component Sandbox -->
+  <div class="card">
+    <div class="label">Interactive Component Sandbox</div>
+    <h2>Test Every Game Interaction Live</h2>
+    <p>Click and play with each piece below to see exactly how the JavaScript state machine and CSS transitions execute in the browser:</p>
+
+    <div class="sandbox-grid">
+      
+      <!-- 1. Drawer & Journal -->
+      <div class="sandbox-card">
+        <div>
+          <h3>🗄️ 1. Interactive Drawer & Journal</h3>
+          <div class="sandbox-desc">Click drawer handle to slide open. Click the hidden journal to place it on the desk.</div>
+          
+          <div class="drawer-box" id="drawerBox">
+            <div class="drawer-inside">
+              <span class="mini-journal" id="miniJournal" onclick="takeJournal()">📓 Journal</span>
+            </div>
+            <div class="drawer-front" id="drawerFront" onclick="toggleDrawer()">
+              <div class="drawer-handle"></div>
+            </div>
+          </div>
+          <div id="deskJournalArea" style="text-align:center;min-height:36px"></div>
+        </div>
+        <button class="btn-reset" onclick="resetDrawer()">Reset Drawer</button>
+      </div>
+
+      <!-- 2. To-Do List & Shrink Task -->
+      <div class="sandbox-card">
+        <div>
+          <h3>📋 2. To-Do List, Paralysis & Shrink</h3>
+          <div class="sandbox-desc">Click notepad to face the choosing dilemma. Break the freeze, then shrink the task.</div>
+          
+          <div class="notepad-box" id="notepadBox">
+            <!-- Initial Paralysis Choices -->
+            <div id="paralysisChoiceBox" style="text-align:center;padding:6px 0">
+              <div style="color:#f4a261;font-size:11px;margin-bottom:8px;font-style:italic">"Too many tasks... where do I even start? Am I even going to finish this?"</div>
+              <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+                <button class="btn-reset" style="margin:0;border-color:#f87171;color:#f87171" onclick="choosePhone()">📱 Check phone first</button>
+                <button class="btn-reset" style="margin:0;border-color:#84bbf7;color:#84bbf7" onclick="chooseAnything()">⚡ Just pick anything</button>
+              </div>
+            </div>
+
+            <!-- Task List (unlocked by picking anything) -->
+            <div id="taskList" style="display:none">
+              <div class="task-item" id="task1" onclick="shrinkTask()">• Finish 2 chapters (Click to select)</div>
+              <div class="task-item" onclick="otherTask('2 projects')">• Work on 2 projects</div>
+              <div class="task-item" onclick="otherTask('study material')">• Prep study material</div>
+              <div class="task-item" onclick="otherTask('C++ course')">• Finish half of C++ course</div>
+              <div class="task-item" onclick="otherTask('the gym')">• Start going to gym</div>
+              <div class="task-item" onclick="otherTask('sleeping schedule')">• Fix sleeping schedule</div>
+            </div>
+
+            <div id="shrinkDialogue" class="task-dialogue" style="display:none"></div>
+          </div>
+        </div>
+        <button class="btn-reset" onclick="resetTask()">Reset To-Do List</button>
+      </div>
+
+      <!-- 3. Laptop Tabs -->
+      <div class="sandbox-card">
+        <div>
+          <h3>💻 3. Laptop Tab Closer</h3>
+          <div class="sandbox-desc">Close the 3 distracting tabs by clicking '✕'. Keep the 2 essential study tabs open.</div>
+          
+          <div class="tabs-browser">
+            <div class="browser-header" id="tabsHeader">
+              <div class="browser-tab essential">📑 Slides</div>
+              <div class="browser-tab essential">📝 Specs</div>
+              <div class="browser-tab" id="tab-reddit">r/csMajors <span class="tab-close" onclick="closeTab('tab-reddit')">✕</span></div>
+              <div class="browser-tab" id="tab-yt">YouTube <span class="tab-close" onclick="closeTab('tab-yt')">✕</span></div>
+              <div class="browser-tab" id="tab-dc">Discord <span class="tab-close" onclick="closeTab('tab-dc')">✕</span></div>
+            </div>
+            <div class="browser-content" id="tabStatus">
+              3 distractions open. Close them to find focus.
+            </div>
+          </div>
+        </div>
+        <button class="btn-reset" onclick="resetTabs()">Reset Tabs</button>
+      </div>
+
+      <!-- 4. Sticky Note Morph -->
+      <div class="sandbox-card">
+        <div>
+          <h3>📌 4. Sticky Note Ending Morph</h3>
+          <div class="sandbox-desc">Click the note to preview how the pressure rule transforms into self-compassion.</div>
+          
+          <div class="sticky-box">
+            <div class="sticky-preview" id="stickyNote" onclick="toggleSticky()">
+              Don't mess this up
+            </div>
+          </div>
+        </div>
+        <button class="btn-reset" onclick="toggleSticky()">Toggle Sticky Note</button>
+      </div>
+
+      <!-- 5. Camera Zoom -->
+      <div class="sandbox-card">
+        <div>
+          <h3>🔍 5. Camera Zoom into Laptop</h3>
+          <div class="sandbox-desc">Click the laptop button to toggle the smooth CSS viewport camera glide.</div>
+          
+          <div class="mini-room-wrap" id="roomWrap">
+            <div class="mini-room">
+              <div class="mini-desk">
+                <div class="mini-laptop-btn" onclick="toggleZoom()">💻 Zoom</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-reset" onclick="toggleZoom()">Toggle Zoom</button>
+      </div>
+
+      <!-- 6. Hold to Breathe -->
+      <div class="sandbox-card">
+        <div>
+          <h3>🌬️ 6. Hold-to-Breathe Timer</h3>
+          <div class="sandbox-desc">Press and hold the mouse button continuously for 3 seconds to loosen chest tightness.</div>
+          
+          <div class="breathe-box">
+            <div class="breathe-circle" id="breatheCircle">Hold</div>
+            <div id="breatheStatus" style="font-size:11px;color:var(--m);margin-top:10px">Press and hold for 3 seconds</div>
+          </div>
+        </div>
+        <button class="btn-reset" onclick="resetBreathe()">Reset Breathe</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Technical Architecture Map -->
+  <div class="card">
+    <div class="label">System Architecture</div>
+    <h2>Clean Separation of Layers</h2>
+    <p>Everything is split into three clean files with zero external build dependencies:</p>
+    
+    <pre>devpost-hackathon-project/
+├── index.html            # Layout, SVGs (desk, drawer, laptop), modals (to-do, journal, breathe)
+├── style.css             # Dark Dome palette, camera transforms, tilted frames, gloomy filters
+├── game.js               # Central state machine (gameState), event listeners, timers
+└── devpost/              # Planning documentation (scope, prd, spec) and HTML companions</pre>
+  </div>
+</div>
+
+<script>
+// 1. Drawer Logic
+function toggleDrawer() {
+  document.getElementById('drawerBox').classList.toggle('drawer-open');
+}
+function takeJournal() {
+  document.getElementById('miniJournal').style.display = 'none';
+  document.getElementById('deskJournalArea').innerHTML = '<span class="desk-journal">📓 Journal placed on desk!</span>';
+}
+function resetDrawer() {
+  document.getElementById('drawerBox').classList.remove('drawer-open');
+  document.getElementById('miniJournal').style.display = 'inline-block';
+  document.getElementById('deskJournalArea').innerHTML = '';
+}
+
+// 2. Shrink Task & Paralysis Logic
+let shrinkStage = 0;
+
+function choosePhone() {
+  const dialogue = document.getElementById('shrinkDialogue');
+  dialogue.style.display = 'block';
+  dialogue.style.color = '#f87171';
+  dialogue.textContent = '"The phone won\'t help... it isn\'t getting anywhere, but it will affect my anxiety if I\'m late to these tasks."';
+}
+
+function chooseAnything() {
+  document.getElementById('paralysisChoiceBox').style.display = 'none';
+  document.getElementById('taskList').style.display = 'block';
+  const dialogue = document.getElementById('shrinkDialogue');
+  dialogue.style.display = 'block';
+  dialogue.style.color = '#84bbf7';
+  dialogue.textContent = '"Okay. Action is what matters. Let\'s just pick the chapters task."';
+}
+
+function shrinkTask() {
+  const task = document.getElementById('task1');
+  const dialogue = document.getElementById('shrinkDialogue');
+  dialogue.style.display = 'block';
+
+  if (shrinkStage === 0) {
+    // Click 1: Thought plays questioning the huge task. Text stays 2 chapters!
+    dialogue.style.color = '#f4a261';
+    dialogue.textContent = '"2 chapters is one big task, isn\'t it? Shall we shrink the task and be more realistic? We aren\'t superheroes the last time I checked."';
+    task.textContent = '• Finish 2 chapters (Click again to shrink)';
+    task.style.color = '#f4a261';
+    shrinkStage = 1;
+  } else if (shrinkStage === 1) {
+    // Click 2: Now the task actually shrinks, and the calming speech plays with deep blue highlight!
+    task.textContent = '• Finish studying first 3 pages of chapter 1';
+    task.style.color = '#84bbf7';
+    dialogue.style.color = '#86efac';
+    dialogue.innerHTML = '"A bit better. But remember, the real first task is just to open the book to page 1.<br><span style=\\"display:inline-block;margin-top:6px;background:#1e3a8a;color:#ffffff;border:1px solid #3b82f6;padding:3px 8px;border-radius:4px;font-style:normal;font-weight:600;letter-spacing:0.3px\\">Next goal: clear unnecessary tabs on the laptop.</span>"';
+    shrinkStage = 2;
+  } else if (shrinkStage === 2) {
+    dialogue.style.color = '#86efac';
+    dialogue.innerHTML = '"Action is the real victory. Just opening the book to page 1 is enough.<br><span style=\\"display:inline-block;margin-top:6px;background:#1e3a8a;color:#ffffff;border:1px solid #3b82f6;padding:3px 8px;border-radius:4px;font-style:normal;font-weight:600;letter-spacing:0.3px\\">Next goal: clear unnecessary tabs on the laptop.</span>"';
+  }
+}
+
+function otherTask(name) {
+  const dialogue = document.getElementById('shrinkDialogue');
+  dialogue.style.display = 'block';
+  dialogue.style.color = '#f4a261';
+  dialogue.textContent = '"Maybe ' + name + '? No... don\'t jump between tasks. Let\'s stick to this one."';
+}
+
+function resetTask() {
+  shrinkStage = 0;
+  document.getElementById('paralysisChoiceBox').style.display = 'block';
+  document.getElementById('taskList').style.display = 'none';
+  const task = document.getElementById('task1');
+  task.textContent = '• Finish 2 chapters (Click to select)';
+  task.style.color = '#e2eaf5';
+  document.getElementById('shrinkDialogue').style.display = 'none';
+}
+
+// 3. Laptop Tabs Logic
+let closedTabsCount = 0;
+function closeTab(id) {
+  const tab = document.getElementById(id);
+  if (tab) {
+    tab.style.display = 'none';
+    closedTabsCount++;
+    if (closedTabsCount >= 3) {
+      document.getElementById('tabStatus').innerHTML = '<b style="color:#86efac">✨ Only course slides and specs remain! Mind still feels cluttered though...</b>';
+    } else {
+      document.getElementById('tabStatus').textContent = (3 - closedTabsCount) + ' distractions remaining.';
+    }
+  }
+}
+function resetTabs() {
+  closedTabsCount = 0;
+  ['tab-reddit', 'tab-yt', 'tab-dc'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'flex';
+  });
+  document.getElementById('tabStatus').textContent = '3 distractions open. Close them to find focus.';
+}
+
+// 4. Sticky Note Morph
+let isMorphed = false;
+function toggleSticky() {
+  const note = document.getElementById('stickyNote');
+  isMorphed = !isMorphed;
+  note.classList.toggle('morphed', isMorphed);
+  note.textContent = isMorphed ? "Don't be so hard on yourself" : "Don't mess this up";
+}
+
+// 5. Camera Zoom
+function toggleZoom() {
+  document.getElementById('roomWrap').classList.toggle('zoomed');
+}
+
+// 6. Hold to Breathe
+const circle = document.getElementById('breatheCircle');
+const statusText = document.getElementById('breatheStatus');
+let breatheTimer = null;
+
+circle.addEventListener('mousedown', () => {
+  circle.classList.add('holding');
+  statusText.textContent = "Breathing in... Keep holding...";
+  breatheTimer = setTimeout(() => {
+    statusText.textContent = "✨ Breath complete. Chest loosened.";
+    circle.style.background = "#86efac";
+  }, 3000);
+});
+
+window.addEventListener('mouseup', () => {
+  if (breatheTimer) {
+    clearTimeout(breatheTimer);
+    breatheTimer = null;
+    circle.classList.remove('holding');
+    circle.style.background = "radial-gradient(circle, #4b8fe2 0%, #162a4a 100%)";
+    if (!statusText.textContent.includes('complete')) {
+      statusText.textContent = "Released early. Take a full 3 seconds.";
+    }
+  }
+});
+function resetBreathe() {
+  circle.classList.remove('holding');
+  circle.style.background = "radial-gradient(circle, #4b8fe2 0%, #162a4a 100%)";
+  statusText.textContent = "Press and hold for 3 seconds";
+}
+</script>
+</body>
+</html>

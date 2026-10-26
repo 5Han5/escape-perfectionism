@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escape Perfectionism — A Dark Dome Style Escape Room</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== Title Screen: big rainy window, Start, About, intro story ===== -->
+  <div class="title-screen" id="titleScreen">
+    <div class="title-window" aria-hidden="true">
+      <div class="title-glass">
+        <canvas id="titleRainCanvas" class="rain-canvas"></canvas>
+        <div class="glass-sheen"></div>
+      </div>
+      <div class="title-mullion title-mullion-left"></div>
+      <div class="title-mullion title-mullion-right"></div>
+      <div class="title-sill"></div>
+    </div>
+    <div class="title-lamp-glow" aria-hidden="true"></div>
+    <div class="title-vignette" aria-hidden="true"></div>
+
+    <div class="title-menu" id="titleMenu">
+      <div class="title-kicker">a quiet, rainy night at the desk</div>
+      <h1 class="title-name" id="titleHeading">Escape Perfectionism</h1>
+      <button class="title-start-btn" id="titleStartBtn">Start</button>
+      <button class="title-about-btn" id="titleAboutBtn">About the Game</button>
+    </div>
+
+    <div class="about-panel" id="aboutPanel">
+      <h2>About the Game</h2>
+      <p>
+        <b>Escape Perfectionism</b> is a short story game about getting stuck because everything has to be perfect.
+      </p>
+      <p>
+        You sit at a student's desk late at night. Step by step, we will shrink a big to-do list, clear the laptop,
+        read your journal, and take a slow breath. Then you start. No pressure. No perfect.
+      </p>
+      <ul>
+        <li>🕒 About 5 minutes</li>
+        <li>🖱️ Mouse only: click things on the desk</li>
+        <li>🎧 Sound is recommended</li>
+        <li>💙 Note: this game talks about stress and self-criticism, gently</li>
+      </ul>
+      <button class="title-about-btn" id="aboutBackBtn">← Back</button>
+    </div>
+
+    <div class="title-story" id="titleStory">
+      <div class="story-lines" id="storyLines"></div>
+      <div class="story-skip">click to continue</div>
+    </div>
+  </div>
+
+  <!-- Rain sound toggle & volume control (always available) -->
+  <div class="global-sound-widget" id="globalSoundWidget">
+    <button class="sound-toggle" id="soundToggle" title="Toggle rain sound">🔊</button>
+    <div class="global-volume-popout">
+      <input type="range" id="globalVolumeSlider" class="volume-slider global-slider" min="0" max="1" step="0.01" value="0.6" title="Rain volume">
+    </div>
+  </div>
+
+  <!-- Top Status & Meta Header -->
+  <header class="game-header">
+    <div class="game-title">Escape Perfectionism</div>
+    <div class="game-status-hint" id="gameStatusHint">Next: Open your to-do list</div>
+  </header>
+
+  <!-- Main 16:9 Dark Dome Room Viewport -->
+  <main id="game-viewport">
+    
+    <!-- Camera Pan & Zoom Container (for smooth CSS transform zooms) -->
+    <!-- Walk-Up Rig: plays the "walking toward the desk" intro animation -->
+    <div class="walk-rig pre-walk" id="walkRig">
+    <div class="camera-rig" id="cameraRig">
+
+      <!-- Clean Dark Dome Hand-Drawn Background Artwork (Direct Straight-On View) -->
+      <div class="room-background" id="roomScene">
+
+        <!-- Rainy Window on the wall behind the desk (z-index: 2) -->
+        <div class="room-window" aria-hidden="true">
+          <div class="room-window-glass">
+            <canvas id="roomRainCanvas" class="rain-canvas"></canvas>
+            <div class="glass-sheen"></div>
+          </div>
+          <div class="room-window-mullion"></div>
+        </div>
+
+        <div class="screen-glow" aria-hidden="true"></div>
+        <div class="room-vignette" aria-hidden="true"></div>
+
+        <!-- Hotspot: Single Pinned Sticky Note on Right Wall -->
+        <div class="hotspot hotspot-single-sticky" id="stickyNoteRight" onclick="onStickyNoteClick()" title="Don't mess this up">
+          <div class="sticky-paper-content" id="stickyPaperContent">
+            <div class="sticky-tape-strip"></div>
+            <div class="sticky-handwriting" id="stickyMainText">DON'T MESS<br>THIS UP.</div>
+            <div class="sticky-sub-whisper" id="stickySubText">(Everything must be perfect)</div>
+          </div>
+          <div class="desk-hover-tag" id="stickyHoverTag">Don't mess this up</div>
+        </div>
+
+        <!-- Laptop Screen Fitted Inside the Drawn Desk Laptop -->
+        <div class="laptop-unit-container" id="laptopUnit">
+          <div class="hotspot hotspot-laptop-screen" id="deskLaptop" onclick="onLaptopClick(event)" title="Laptop">
+            <div class="laptop-screen-display">
+              <!-- Chrome-style Tab Strip + Plus Icon -->
+              <div class="chrome-tab-strip">
+                <div class="game-tabs-bar" id="screenTabs" role="tablist" aria-label="Browser tabs"></div>
+                <span class="chrome-tab-plus" aria-hidden="true">+</span>
+              </div>
+              <!-- Chrome Navigation & Address Bar -->
+              <div class="chrome-toolbar">
+                <span class="chrome-nav" aria-hidden="true">←&nbsp;&nbsp;→&nbsp;&nbsp;⟳</span>
+                <div class="chrome-address">
+                  <span class="url-lock" aria-hidden="true">🔒</span>
+                  <span id="browserUrlText">seek.example</span>
+                </div>
+                <span class="chrome-menu-dots" aria-hidden="true">⋮</span>
+              </div>
+              <!-- Dynamic Tab Pages -->
+              <div class="game-window-content" id="tabPages"></div>
+              <!-- Status Footer -->
+              <div class="game-screen-footer">
+                <span id="tabCountText">3 distractions open</span>
+                <span class="game-footer-action">Close the distraction tabs with ✕</span>
+              </div>
+            </div>
+            <div class="desk-hover-tag">Laptop</div>
+          </div>
+        </div>
+
+        <!-- Hotspot: Modern Royal Blue Hardcover Journal on Left -->
+        <div class="hotspot hotspot-journal-left" id="deskJournal" onclick="openJournal()" title="Grounding Journal">
+          <div class="desk-journal-visual">
+            <div class="journal-cover-spine"></div>
+            <div class="journal-cover-front">
+              <span class="journal-emboss">JOURNAL</span>
+            </div>
+            <div class="journal-pages-edge"></div>
+            <div class="journal-bookmark-ribbon"></div>
+          </div>
+          <div class="journal-glow-ring" id="journalGlow"></div>
+          <div class="desk-hover-tag">Grounding journal</div>
+        </div>
+
+        <!-- Hotspot: Modern To-Do Checklist Notepad on Right -->
+        <div class="hotspot hotspot-notepad-right" id="deskNotepad" onclick="openNotepad()" title="To-Do List">
+          <div class="desk-notepad-visual">
+            <div class="notepad-top-binding"></div>
+            <div class="notepad-sheet">
+              <div class="notepad-ruled-line"></div>
+              <div class="notepad-ruled-line"></div>
+              <div class="notepad-ruled-line"></div>
+              <div class="notepad-ruled-line"></div>
+              <div class="notepad-mini-check"></div>
+            </div>
+            <div class="single-blue-pen">
+              <div class="pen-body"></div>
+              <div class="pen-clip"></div>
+              <div class="pen-tip"></div>
+            </div>
+          </div>
+          <div class="notepad-glow-ring"></div>
+          <div class="desk-hover-tag">To-do list</div>
+        </div>
+
+      </div>
+
+    </div>
+    </div>
+
+    <!-- Dark edges that lift as you arrive at the desk -->
+    <div class="intro-shade" id="introShade"></div>
+
+    <!-- Zoom Back Button (appears when camera is zoomed into laptop) -->
+    <button class="btn-zoom-back" id="btnZoomBack" onclick="zoomOutLaptop()" title="Return to desk view">
+      ◀ Back to Desk
+    </button>
+
+    <!-- Floating Inner Voice Monologue -->
+    <div class="dialogue-box" id="dialogueBox">
+      <div class="dialogue-text" id="dialogueText">
+        "I have so much to do, and I do not know where to start."
+      </div>
+      <div class="dialogue-subtext" id="dialogueSubtext">
+        (Click the notepad on the right to look at your list.)
+      </div>
+    </div>
+
+    <!-- 3 Choices Hovering Above the Notepad on the Desk (until "Just pick one" is chosen) -->
+    <div class="paralysis-hover-box" id="paralysisBox" style="display: none;">
+      <div class="paralysis-quote">
+        "So many tasks... where do I even start? Will I even finish?"
+      </div>
+      <div class="paralysis-choices">
+        <button class="choice-btn btn-phone" onclick="choosePhone()">
+          📱 Check my phone first
+        </button>
+        <button class="choice-btn btn-fun" onclick="chooseFun()">
+          🎮 Do something fun instead
+        </button>
+        <button class="choice-btn btn-action" onclick="choosePickAnything()">
+          ⚡ Just pick one
+        </button>
+      </div>
+    </div>
+
+    <!-- Interactive Notepad Modal Overlay (Only shows the tasks to do once "Just pick one" is chosen) -->
+    <div class="notepad-modal-overlay" id="notepadOverlay">
+      <div class="notepad-modal" id="notepadModal">
+        
+        <!-- Modern Tear-Off Header with Binder Clip -->
+        <div class="notepad-clip-band">
+          <div class="binder-clip-metal"></div>
+          <span class="notepad-title">📋 My To-Do List</span>
+          <button class="notepad-close-btn" onclick="closeNotepad()" title="Close notepad">✕</button>
+        </div>
+
+        <div class="notepad-paper-body">
+          <div class="notepad-red-line"></div>
+
+          <!-- Task List (Clean Modern Checklist) -->
+          <div class="task-items-list" id="taskList">
+            <div class="task-entry" id="task1" onclick="handleTask1Click()">
+              <span class="chk-box" id="task1Chk">[ ]</span>
+              <span class="task-name" id="task1Text">Finish 2 chapters</span>
+            </div>
+            <div class="task-entry" onclick="handleOtherTask('Work on 2 projects')">
+              <span class="chk-box">[ ]</span>
+              <span class="task-name">Work on 2 projects</span>
+            </div>
+            <div class="task-entry" onclick="handleOtherTask('Prepare study notes for next week')">
+              <span class="chk-box">[ ]</span>
+              <span class="task-name">Prepare study notes for next week</span>
+            </div>
+            <div class="task-entry" onclick="handleOtherTask('Finish half of the C++ course')">
+              <span class="chk-box">[ ]</span>
+              <span class="task-name">Finish half of the C++ course</span>
+            </div>
+            <div class="task-entry" onclick="handleOtherTask('Start going to gym')">
+              <span class="chk-box">[ ]</span>
+              <span class="task-name">Start going to gym</span>
+            </div>
+            <div class="task-entry" onclick="handleOtherTask('Fix my sleep schedule')">
+              <span class="chk-box">[ ]</span>
+              <span class="task-name">Fix my sleep schedule</span>
+            </div>
+          </div>
+
+          <!-- Footer / Reset Control -->
+          <div class="ui-footer-controls">
+            <span class="footer-note">Escape Perfectionism · Tear-off Pad</span>
+            <button type="button" class="btn-ui-reset" onclick="resetNotepadState()">Reset To-Do</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Authentic Open Spiral Notebook Modal -->
+    <div class="journal-modal-overlay" id="journalModalOverlay">
+      <div class="journal-open-notebook">
+        
+        <!-- Close Button (Top right of notebook spread) -->
+        <button type="button" class="journal-spread-close" onclick="closeJournal()" title="Close journal">✕</button>
+
+        <!-- Blue Index Tabs sticking out from the right page -->
+        <div class="journal-right-tabs" aria-hidden="true">
+          <button type="button" class="jtab-ribbon active" id="jtab-pill-1" onclick="flipJournalSpread(1)">1. Pressure</button>
+          <button type="button" class="jtab-ribbon" id="jtab-pill-2" onclick="flipJournalSpread(2)">2. Critic</button>
+          <button type="button" class="jtab-ribbon" id="jtab-pill-3" onclick="flipJournalSpread(3)">3. Panic</button>
+        </div>
+
+        <!-- Two Open Pages Spread Container -->
+        <div class="notebook-pages-container">
+          
+          <!-- LEFT PAGE -->
+          <div class="notebook-page page-left">
+            <div class="page-inner-header">
+              <span class="page-date-stamp" id="leftDateStamp">OCTOBER 23 · 02:14 AM</span>
+              <span class="page-section-name" id="leftSectionName">The Pressure</span>
+            </div>
+
+            <!-- Page Spread Content: Left Side -->
+            <div class="page-body-content" id="leftSpreadContent"></div>
+
+            <!-- Footer Left: Prev Arrow Navigation -->
+            <div class="page-inner-footer">
+              <button type="button" class="journal-arrow-btn prev-btn" id="btnPrevJournal" onclick="prevJournalPage()">
+                ← Prev Page
+              </button>
+              <span class="journal-page-number" id="leftPageIndicator">p. 1</span>
+            </div>
+          </div>
+
+          <!-- CENTER SPIRAL COIL SPINE -->
+          <div class="notebook-spiral-spine" aria-hidden="true">
+            <div class="spiral-hole-column">
+              <div class="spiral-ring"></div>
+              <div class="spiral-ring"></div>
+              <div class="spiral-ring"></div>
+              <div class="spiral-ring"></div>
+              <div class="spiral-ring"></div>
+              <div class="spiral-ring"></div>
+              <div class="spiral-ring"></div>
+              <div class="spiral-ring"></div>
+              <div class="spiral-ring"></div>
+              <div class="spiral-ring"></div>
+              <div class="spiral-ring"></div>
+              <div class="spiral-ring"></div>
+            </div>
+          </div>
+
+          <!-- RIGHT PAGE -->
+          <div class="notebook-page page-right">
+            <div class="page-inner-header">
+              <span class="page-section-name" id="rightSectionName">What It Really Means</span>
+              <span class="page-date-stamp" id="rightDateStamp">HOVER TO READ</span>
+            </div>
+
+            <!-- Page Spread Content: Right Side -->
+            <div class="page-body-content" id="rightSpreadContent"></div>
+
+            <!-- Footer Right: Next Arrow Navigation -->
+            <div class="page-inner-footer right-align">
+              <span class="journal-page-number" id="rightPageIndicator">p. 2</span>
+              <button type="button" class="journal-arrow-btn next-btn" id="btnNextJournal" onclick="nextJournalPage()">
+                Next Page →
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Hold-to-Breathe Somatic Modal (spec.md Component 6) -->
+    <div class="breathe-modal-overlay" id="breatheModal">
+      <div class="breathe-box">
+        <div class="breathe-title">Calm Your Chest</div>
+        <div class="breathe-instruction">Press and hold the circle for 3 seconds</div>
+        
+        <div class="breathe-circle-container" id="breatheCircle" onmousedown="onBreatheDown()" onmouseup="onBreatheUp()" ontouchstart="onBreatheDown()" ontouchend="onBreatheUp()">
+          <div class="breathe-core-ring"></div>
+          <div class="breathe-pulse-text" id="breatheLabel">HOLD</div>
+        </div>
+
+        <div class="breathe-status-hint" id="breatheHint">Ready when you are.</div>
+      </div>
+    </div>
+
+    <!-- Ending Victory Banner (spec.md Step 9) -->
+    <div class="ending-banner-overlay" id="endingOverlay">
+      <div class="ending-card">
+        <div class="ending-symbol">🌱</div>
+        <div class="ending-title">Starting Is the Real Win.</div>
+        <div class="ending-quote">
+          "Be gentle with yourself. One small, imperfect step is better than a perfect plan you never start."
+        </div>
+        <div class="ending-next">Your turn: open your real book to page 1 and read one sentence.</div>
+        <div class="ending-actions">
+          <button class="btn-ending-restart" onclick="restartEntireGame()">Play again</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="rain.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
