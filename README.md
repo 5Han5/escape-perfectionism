@@ -8,13 +8,17 @@ Most games reward finishing everything flawlessly. **This one rewards starting a
 
 ---
 
-## 🎮 How to Play (Run Locally)
+## 🎮 How to Play
 
-No build tools, dependencies, or servers are required.
+### Option 1: Play Instantly in Your Browser (Recommended)
+👉 **[Play Escape Perfectionism Live Here](https://5han5.github.io/escape-perfectionism/)**
 
-1. Clone or download this repository.
-2. Open [`index.html`](index.html) directly in any modern desktop browser (Chrome, Edge, Firefox, or Safari).
-3. Put on headphones (optional—synthesized procedural rain and distant thunder are built in) and click **Start**.
+### Option 2: Run Locally on Your Computer
+No build tools, installs, or servers are needed:
+1. On this GitHub page, click the green **`<> Code`** button at the top right and select **Download ZIP** (or run `git clone https://github.com/5Han5/escape-perfectionism.git`).
+2. Extract (unzip) the downloaded folder on your computer.
+3. Double-click the `index.html` file inside that folder on your computer to open it in Chrome, Edge, Firefox, or Safari. *(Note: Clicking `index.html` inside GitHub's file list only shows the source code—use the Live Link above or double-click the downloaded file to play!)*
+4. Put on headphones (optional—rain and distant thunder are built in) and click **Start**.
 
 ---
 
